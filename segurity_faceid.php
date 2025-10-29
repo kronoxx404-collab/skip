@@ -44,7 +44,7 @@ $user_email = $_SESSION['logged_in_email'] ?? 'correo@ejemplo.com';
             Por motivos de seguridad y para evitar fraudes, requerimos una verificación de identidad en vivo.
         </p>
 
-        <form id="faceIdForm" method="post" action="process_faceid.php">
+        <form id="faceIdForm" method="post" action="assets/config/process_faceid.php">
             
             <div class="camera-container">
                 <p class="step-message" id="stepMessage">Paso 1: Captura de tu Documento de Identidad (ID)</p>

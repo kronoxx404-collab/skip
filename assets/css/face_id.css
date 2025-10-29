@@ -1,10 +1,9 @@
 /*
  * face_id.css
- * Estilos específicos para la página de Verificación Face ID.
- * Complementa login.css y los estilos base.
+ * Estilos específicos para la página de Verificación de Identidad (Face ID).
  */
 
-/* Advertencia Superior (tomada de segurity.css) */
+/* Advertencia Superior */
 .top-warning {
     background: #fef3c7; 
     color: #92400e; 
@@ -16,7 +15,7 @@
     border-bottom: 1px solid #fde68a;
 }
 
-/* Bloque de Usuario Logueado (tomado de segurity.css) */
+/* Bloque de Usuario Logueado (Hi, email | log out) */
 .user-block {
     text-align: right;
     margin-top: 10px; 
@@ -62,7 +61,7 @@
     text-decoration: none;
 }
 
-/* Títulos y texto principales (tomados de segurity.css) */
+/* Contenido Principal */
 .security-title {
     font-size: 26px; 
     font-weight: 600;
@@ -73,94 +72,53 @@
     line-height: 1.4;
     margin-bottom: 18px;
 }
-.instructions {
-    font-size: 14px;
-    color: var(--muted);
-    margin-bottom: 15px;
+.email-link {
+    font-weight: 700;
+    color: var(--brand-color, #8b1838); 
+    text-decoration: none;
+}
+.help-link {
+    font-weight: 600;
 }
 
-/* Estilos específicos de Face ID */
-.verification-step {
-    background: #f9fafb;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 25px;
-    text-align: center;
+/* --- ESTILOS ESPECÍFICOS DE LA CÁMARA (FACE ID) --- */
+.camera-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px auto; /* Centrar en el eje X */
+    max-width: 400px;
+    width: 100%;
+    overflow: hidden; /* **CLAVE** para evitar que elementos internos desborden la página */
 }
-.verification-step h2 {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text);
-    margin-top: 0;
+#videoElement, 
+#capturedImage, 
+#idImage, 
+#selfieImage {
+    width: 100%; /* Ocupa el 100% del contenedor de 400px */
+    height: auto; /* **CLAVE** para mantener el responsive */
+    max-width: 400px;
+    display: block;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
     margin-bottom: 10px;
 }
-.camera-container {
-    position: relative;
-    width: 100%;
-    max-width: 400px; /* Ancho máximo para el video/canvas */
-    margin: 0 auto 15px;
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    overflow: hidden; /* Para que la imagen/video no se desborde */
+#canvas {
+    display: none; 
 }
-.camera-container video,
-.camera-container canvas,
-.camera-container img.photo-preview {
-    display: block; /* Asegura que no haya espacio extra */
-    width: 100%;
-    height: auto; /* Mantener la proporción */
-    min-height: 250px; /* Altura mínima para que se vea bien */
-    background: #e0e0e0; /* Fondo gris mientras no haya video */
-    object-fit: cover; /* Ajustar imagen/video sin distorsionar */
+.step-message {
+    font-weight: 700;
+    color: var(--danger);
+    text-align: center;
+    margin-bottom: 10px;
 }
-.camera-container video {
-    transform: scaleX(-1); /* Reflejar video para selfie (espejo) */
-}
-.camera-container button {
-    margin-top: 15px;
-    width: auto;
-    min-width: 150px;
-    padding: 12px 20px;
-}
-.primary-btn {
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background .15s ease;
-}
-.primary-btn:hover {
-    background: var(--primary-hover);
-}
-.secondary-btn {
-    background: #e5e7eb;
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    margin-left: 10px; /* Separación si hay varios botones */
-}
-.secondary-btn:hover {
-    background: #d1d5db;
+.camera-container .btn {
+    width: 100%; /* Asegura que los botones ocupen el ancho del contenedor */
+    max-width: 400px;
+    margin: 0 0 10px 0 !important;
 }
 
-#submitVerification {
-    display: block;
-    margin: 20px auto 30px;
-    width: min(100%, 300px); /* Botón de envío más grande y centrado */
-    height: 50px;
-    font-size: 18px;
-}
-#submitVerification:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Footer Links (Móvil) (tomados de segurity.css) */
+/* Footer Links (Móvil) */
 @media (max-width: 959px) {
     .footer-mobile-links {
         display: flex;

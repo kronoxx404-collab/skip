@@ -18,32 +18,51 @@ let isFrontCamera = false;
 let videoDevices = [];
 let currentDeviceId = null;
 
+// Función auxiliar para obtener las restricciones de video
+function getVideoConstraints(deviceId, preferFront) {
+    // Si la cámara frontal está fallando, evitamos el 'exact'
+    let facingMode = preferFront ? 'user' : 'environment'; 
+    
+    // Si tenemos un DeviceId específico, lo usamos
+    let constraints = {
+        video: {
+            deviceId: deviceId ? { exact: deviceId } : undefined,
+            facingMode: facingMode
+        },
+        audio: false
+    };
+
+    return constraints;
+}
+
+
 // 1. Inicializar la cámara (Función Principal)
 async function startCamera(deviceId = null, preferFront = false) {
     if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
     }
-
-    const constraints = {
-        video: {
-            // Si se especifica un dispositivo, úsalo
-            ...(deviceId && {deviceId: {exact: deviceId}}),
-            // Preferencia de cámara (frontal/trasera)
-            facingMode: preferFront ? 'user' : { exact: "environment" }
-        },
-        audio: false
-    };
+    
+    let constraints = getVideoConstraints(deviceId, preferFront);
 
     try {
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
         video.play();
-        // Reflejar la imagen para selfies (cámara frontal)
-        video.style.transform = (preferFront) ? 'scaleX(-1)' : 'scaleX(1)'; 
-        isFrontCamera = preferFront;
-        video.style.display = 'block'; // Asegurar que el video se muestre
+        
+        const videoTrack = currentStream.getVideoTracks()[0];
+        const settings = videoTrack.getSettings();
+        
+        // Determinar si reflejar la imagen (si es 'user' o si la etiqueta indica frontal)
+        const isUserFacing = settings.facingMode === 'user' || (videoTrack.label && videoTrack.label.toLowerCase().includes('front'));
+
+        video.style.transform = (isUserFacing) ? 'scaleX(-1)' : 'scaleX(1)'; 
+        isFrontCamera = isUserFacing;
+        video.style.display = 'block'; 
+        currentDeviceId = settings.deviceId; // Guardar el DeviceId actual
+
     } catch (err) {
-        stepMessage.textContent = 'Error: No se puede acceder a la cámara. Asegúrate de dar permiso.';
+        // En caso de error, mostrar el mensaje específico
+        stepMessage.innerHTML = '<span style="color:red">Error: No se puede acceder a la cámara. Asegúrate de dar permiso.</span>';
         console.error("Error al acceder a la cámara: ", err);
     }
 }
@@ -53,9 +72,9 @@ async function getCameras() {
     // Pedir permisos inicialmente para asegurar que enumerateDevices devuelva etiquetas útiles
     try {
         currentStream = await navigator.mediaDevices.getUserMedia({video: true});
-        currentStream.getTracks().forEach(track => track.stop()); // Detener la cámara inicial
+        currentStream.getTracks().forEach(track => track.stop()); 
     } catch(e) {
-        console.warn("Permiso de cámara no concedido inicialmente.");
+        // Si no hay permisos, startCamera manejará el error al intentar activarla
     }
     
     videoDevices = (await navigator.mediaDevices.enumerateDevices()).filter(device => device.kind === 'videoinput');
@@ -66,7 +85,7 @@ async function getCameras() {
         
         if (rearCamera) {
             currentDeviceId = rearCamera.deviceId;
-            startCamera(currentDeviceId, false); // Iniciar con la trasera (false = no frontal)
+            startCamera(currentDeviceId, false); // Iniciar con la trasera
         } else {
             currentDeviceId = videoDevices[0].deviceId;
             startCamera(currentDeviceId, false); // Iniciar con la primera disponible
@@ -80,7 +99,7 @@ async function getCameras() {
 
 // 3. Cambiar de cámara (frontal/trasera)
 switchButton.addEventListener('click', async () => {
-    // Busca el dispositivo opuesto al actual
+    // Buscar el dispositivo opuesto al actual
     const otherCamera = videoDevices.find(d => d.deviceId !== currentDeviceId);
     
     if (otherCamera) {
@@ -95,7 +114,6 @@ switchButton.addEventListener('click', async () => {
 captureButton.addEventListener('click', () => {
     if (!currentStream) return;
     
-    // Configurar canvas para la captura
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const context = canvas.getContext('2d');
@@ -107,12 +125,9 @@ captureButton.addEventListener('click', () => {
     }
     
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Obtener la data de la foto
     const photoData = canvas.toDataURL('image/jpeg', 0.9);
-    
-    // Limpiar las transformaciones del contexto
     context.setTransform(1, 0, 0, 1, 0, 0);
+    
     
     // PROCESAR SEGÚN EL PASO
     if (currentStep === 'ID') {

